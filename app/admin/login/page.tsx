@@ -1,55 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabase";
 
-export default function ForgotPasswordPage() {
+export default function AdminLoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({ email, password });
 
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
+    if (authError) {
+      setLoading(false);
+      setError("Correo o contraseña incorrectos.");
       return;
     }
 
-    setSent(true);
-  };
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", authData.user.id)
+      .single();
 
-  if (sent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F2EF] px-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <h1 className="font-serif text-2xl text-[#2C2421] mb-3">
-            Revisa tu correo
-          </h1>
-          <p className="text-sm text-gray-600">
-            Si existe una cuenta con <strong>{email}</strong>, te enviamos un
-            enlace para restablecer tu contraseña.
-          </p>
-          <Link
-            href="/login"
-            className="inline-block mt-6 text-sm text-[#2C2421] font-medium hover:underline"
-          >
-            Volver a iniciar sesión
-          </Link>
-        </div>
-      </div>
-    );
-  }
+    if (profileError || profile?.role !== "admin") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError("Esta cuenta no tiene acceso al panel de administración.");
+      return;
+    }
+
+    router.push("/admin/dashboard");
+    router.refresh();
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F2EF] px-4">
@@ -58,7 +49,7 @@ export default function ForgotPasswordPage() {
           ISLA
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Recupera tu contraseña
+          Panel de administración
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -72,7 +63,21 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
-              placeholder="tu@email.com"
+              placeholder="admin@islastudio.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
+              placeholder="••••••••"
             />
           </div>
 
@@ -87,15 +92,9 @@ export default function ForgotPasswordPage() {
             disabled={loading}
             className="w-full bg-[#2C2421] hover:bg-black text-white font-semibold py-3 rounded-xl text-sm transition-colors disabled:opacity-50"
           >
-            {loading ? "Enviando..." : "Enviar enlace"}
+            {loading ? "Verificando..." : "Entrar al panel"}
           </button>
         </form>
-
-        <p className="text-sm text-gray-500 text-center mt-6">
-          <Link href="/login" className="text-[#2C2421] font-medium hover:underline">
-            Volver a iniciar sesión
-          </Link>
-        </p>
       </div>
     </div>
   );

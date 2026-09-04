@@ -1,4 +1,3 @@
-// app/reset-password/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,8 +14,6 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Supabase dispara este evento cuando el link de recuperación
-    // se procesa y crea una sesión temporal.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event) => {
         if (event === "PASSWORD_RECOVERY") {
@@ -25,7 +22,6 @@ export default function ResetPasswordPage() {
       }
     );
 
-    // Fallback: si ya hay sesión activa al cargar (algunos flujos la crean antes del evento)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setReady(true);
     });

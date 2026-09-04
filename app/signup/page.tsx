@@ -1,4 +1,3 @@
-// app/signup/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -34,6 +33,7 @@ export default function SignupPage() {
       password,
       options: {
         data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/email-confirmed`,
       },
     });
 
