@@ -5,7 +5,6 @@ export default function AboutSection() {
     <section className="w-full bg-[#f4f7fa] py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         
-        {/* Lado Izquierdo: Imagen */}
         <div className="relative w-full rounded-sm shadow-sm overflow-hidden">
           <img
             src="/aboutimg.jpg"
