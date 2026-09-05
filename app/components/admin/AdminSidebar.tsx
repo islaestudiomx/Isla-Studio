@@ -23,7 +23,7 @@ const NAV_SECTIONS = [
   { label: "Resumen", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Horarios", href: "/admin/horarios", icon: Calendar },
   { label: "Tipos de clase", href: "/admin/tipos-clase", icon: Layers },
-  { label: "Disciplina", href: "/admin/disciplinas", icon: Dumbbell },
+  { label: "Disciplinas", href: "/admin/disciplinas", icon: Dumbbell },
   { label: "Instructores", href: "/admin/instructores", icon: Users },
   { label: "Reservas", href: "/admin/reservas", icon: BookOpen },
   { label: "Paquetes", href: "/admin/paquetes", icon: Package },

@@ -7,6 +7,7 @@ import { supabase } from "@/utils/supabase";
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,7 +33,10 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: name },
+        data: {
+          full_name: name,
+          fecha_nacimiento: fechaNacimiento || null,
+        },
         emailRedirectTo: `${window.location.origin}/email-confirmed`,
       },
     });
@@ -43,12 +47,6 @@ export default function SignupPage() {
       setError(error.message);
       return;
     }
-
-    // Si tu proyecto no tiene un trigger que copie full_name a la tabla profiles,
-    // descomenta esto para insertarlo manualmente:
-    // if (data.user) {
-    //   await supabase.from("profiles").insert({ id: data.user.id, full_name: name });
-    // }
 
     setSuccess(true);
   };
@@ -103,6 +101,19 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
               placeholder="tu@email.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fecha de nacimiento
+            </label>
+            <input
+              type="date"
+              required
+              value={fechaNacimiento}
+              onChange={(e) => setFechaNacimiento(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
             />
           </div>
 

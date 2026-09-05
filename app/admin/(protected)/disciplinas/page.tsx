@@ -5,29 +5,39 @@ import { supabase } from "@/utils/supabase";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import ImageUpload from "@/app/components/admin/ImageUpload";
 
-type TipoClase = {
+type Disciplina = {
   id: string;
   nombre: string;
-  duracion_min: number;
+  texto_extra: string | null;
+  descripcion: string | null;
   imagen_url: string | null;
+  alineacion_imagen: string;
 };
 
-export default function TiposClasePage() {
-  const [items, setItems] = useState<TipoClase[]>([]);
+const ALINEACIONES = [
+  { value: "centro", label: "Centro" },
+  { value: "izquierda", label: "Izquierda" },
+  { value: "derecha", label: "Derecha" },
+];
+
+export default function DisciplinasPage() {
+  const [items, setItems] = useState<Disciplina[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [nombre, setNombre] = useState("");
-  const [duracion, setDuracion] = useState("");
+  const [textoExtra, setTextoExtra] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   const [imagenUrl, setImagenUrl] = useState("");
+  const [alineacion, setAlineacion] = useState("centro");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const fetchItems = async () => {
     setLoading(true);
     const { data } = await supabase
-      .from("tipos_clase")
+      .from("disciplinas")
       .select("*")
       .order("created_at", { ascending: false });
     setItems(data ?? []);
@@ -40,8 +50,10 @@ export default function TiposClasePage() {
 
   const resetForm = () => {
     setNombre("");
-    setDuracion("");
+    setTextoExtra("");
+    setDescripcion("");
     setImagenUrl("");
+    setAlineacion("centro");
     setEditingId(null);
     setError("");
   };
@@ -51,10 +63,12 @@ export default function TiposClasePage() {
     setShowForm(true);
   };
 
-  const handleOpenEdit = (item: TipoClase) => {
+  const handleOpenEdit = (item: Disciplina) => {
     setNombre(item.nombre);
-    setDuracion(String(item.duracion_min));
+    setTextoExtra(item.texto_extra ?? "");
+    setDescripcion(item.descripcion ?? "");
     setImagenUrl(item.imagen_url ?? "");
+    setAlineacion(item.alineacion_imagen ?? "centro");
     setEditingId(item.id);
     setShowForm(true);
   };
@@ -68,8 +82,8 @@ export default function TiposClasePage() {
     e.preventDefault();
     setError("");
 
-    if (!nombre.trim() || !duracion) {
-      setError("Nombre y duración son obligatorios.");
+    if (!nombre.trim() || !descripcion.trim()) {
+      setError("Título y descripción son obligatorios.");
       return;
     }
 
@@ -77,13 +91,15 @@ export default function TiposClasePage() {
 
     const payload = {
       nombre: nombre.trim(),
-      duracion_min: parseInt(duracion, 10),
+      texto_extra: textoExtra.trim() || null,
+      descripcion: descripcion.trim(),
       imagen_url: imagenUrl || null,
+      alineacion_imagen: alineacion,
     };
 
     const { error } = editingId
-      ? await supabase.from("tipos_clase").update(payload).eq("id", editingId)
-      : await supabase.from("tipos_clase").insert(payload);
+      ? await supabase.from("disciplinas").update(payload).eq("id", editingId)
+      : await supabase.from("disciplinas").insert(payload);
 
     setSaving(false);
 
@@ -98,22 +114,22 @@ export default function TiposClasePage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar este tipo de clase?")) return;
-    await supabase.from("tipos_clase").delete().eq("id", id);
+    if (!confirm("¿Eliminar esta disciplina?")) return;
+    await supabase.from("disciplinas").delete().eq("id", id);
     fetchItems();
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-serif text-3xl text-[#2C2421]">Tipos de clase</h1>
+        <h1 className="font-serif text-3xl text-[#2C2421]">Disciplinas</h1>
         {!showForm && (
           <button
             onClick={handleOpenCreate}
             className="flex items-center gap-2 bg-[#2C2421] hover:bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Nueva clase
+            Nueva disciplina
           </button>
         )}
       </div>
@@ -124,42 +140,72 @@ export default function TiposClasePage() {
           className="bg-white rounded-2xl border border-gray-100 p-6 mb-8"
         >
           <h2 className="font-semibold text-[#2C2421] mb-5">
-            {editingId ? "Editar tipo de clase" : "Nuevo tipo de clase"}
+            {editingId ? "Editar disciplina" : "Nueva disciplina"}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
-                Nombre
+                Título
               </label>
               <input
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Indoor ..."
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
-                Duración (min)
+                Texto extra (opcional)
               </label>
               <input
-                type="number"
-                value={duracion}
-                onChange={(e) => setDuracion(e.target.value)}
-                placeholder="50"
+                type="text"
+                value={textoExtra}
+                onChange={(e) => setTextoExtra(e.target.value)}
+                placeholder="Ej: Alta tensión profunda"
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
               />
             </div>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-5">
             <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
-              Imagen
+              Descripción
             </label>
-            <ImageUpload value={imagenUrl} onChange={setImagenUrl} />
+            <textarea
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              rows={4}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421] resize-y"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div>
+              <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
+                Imagen de la disciplina
+              </label>
+              <ImageUpload value={imagenUrl} onChange={setImagenUrl} />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
+                Alineación de imagen
+              </label>
+              <select
+                value={alineacion}
+                onChange={(e) => setAlineacion(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
+              >
+                {ALINEACIONES.map((op) => (
+                  <option key={op.value} value={op.value}>
+                    {op.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {error && (
@@ -174,7 +220,7 @@ export default function TiposClasePage() {
               disabled={saving}
               className="bg-[#2C2421] hover:bg-black text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors disabled:opacity-50"
             >
-              {saving ? "Guardando..." : editingId ? "Guardar cambios" : "Crear"}
+              {saving ? "Guardando..." : editingId ? "Guardar cambios" : "Guardar"}
             </button>
             <button
               type="button"
@@ -187,18 +233,18 @@ export default function TiposClasePage() {
         </form>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {loading ? (
           <p className="text-sm text-gray-400">Cargando...</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-gray-400">No hay tipos de clase todavía.</p>
+          <p className="text-sm text-gray-400">No hay disciplinas todavía.</p>
         ) : (
           items.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4"
             >
-              <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden shrink-0">
+              <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden shrink-0">
                 {item.imagen_url && (
                   <img
                     src={item.imagen_url}
@@ -208,11 +254,11 @@ export default function TiposClasePage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#2C2421] text-sm truncate">
+                <p className="font-semibold text-[#2C2421] text-sm">
                   {item.nombre}
                 </p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {item.duracion_min} min
+                <p className="text-xs text-gray-500 mt-1 line-clamp-1">
+                  {item.descripcion}
                 </p>
               </div>
               <div className="flex items-center gap-1 shrink-0">

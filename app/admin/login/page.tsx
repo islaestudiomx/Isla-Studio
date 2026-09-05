@@ -94,6 +94,10 @@ export default function AdminLoginPage() {
           >
             {loading ? "Verificando..." : "Entrar al panel"}
           </button>
+          <div className="flex justify-center">
+            <a href="/" className="text-sm underline text-gray-700 hover:text-black">Volver al inicio</a>
+          </div>
+          
         </form>
       </div>
     </div>

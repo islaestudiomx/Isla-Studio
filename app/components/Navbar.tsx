@@ -12,14 +12,14 @@ import { supabase } from '@/utils/supabase'
 const NAV_LINKS = [
   { label: "Inicio", href: "/" },
   { label: "Horario", href: "/horario" },
-  { label: "Disciplinas", href: "/disciplinas" },
+  { label: "Eventos", href: "/eventos" },
   { label: "Paquetes", href: "/paquetes" },
 ];
 
 const BOTTOM_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Horario", href: "/horario", icon: Calendar },
-  { label: "Disciplinas", href: "/disciplinas", icon: Zap },
+  { label: "Eventos", href: "/Eventos", icon: Zap },
   { label: "Paquetes", href: "/paquetes", icon: Package },
 ];
 
