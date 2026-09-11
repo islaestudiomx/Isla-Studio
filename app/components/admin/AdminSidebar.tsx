@@ -47,7 +47,8 @@ export default function AdminSidebar() {
     <aside className="w-64 shrink-0 bg-[#2C2421] min-h-screen flex flex-col fixed left-0 top-0 bottom-0">
       <div className="px-6 py-6 border-b border-white/10">
         <h1 className="font-serif text-lg text-white tracking-wide">
-          Isla Studio
+          <a href="/">Isla Studio</a>
+          
         </h1>
         <p className="text-xs text-white/40 mt-0.5">Panel Admin</p>
       </div>

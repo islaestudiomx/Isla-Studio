@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 
 const FOOTER_NAV = [
   { label: "Inicio", href: "/" },
-  { label: "Horario", href: "/horario" },
+  { label: "Horarios", href: "/horarios" },
   { label: "Disciplinas", href: "/disciplinas" },
   { label: "Paquetes", href: "/paquetes" },
 ];

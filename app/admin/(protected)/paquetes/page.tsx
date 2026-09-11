@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { Plus, Eye, EyeOff, Trash2 } from "lucide-react";
 
-type Disciplina = { id: string; nombre: string };
-
 type Paquete = {
   id: string;
   nombre: string;
@@ -13,8 +11,8 @@ type Paquete = {
   num_clases: number;
   precio: number;
   activo: boolean;
-  disciplina_id: string | null;
-  disciplinas: { nombre: string } | null;
+  categoria: string | null;
+  compartido: boolean;
 };
 
 const VIGENCIAS = [
@@ -23,36 +21,44 @@ const VIGENCIAS = [
   { label: "3 meses", dias: 90 },
 ];
 
+const CATEGORIAS = [
+  { value: "", label: "Todas las disciplinas" },
+  { value: "yoga", label: "Yoga" },
+  { value: "pilates", label: "Pilates" },
+  { value: "barre", label: "Barre" },
+];
+
 function labelVigencia(dias: number) {
   const match = VIGENCIAS.find((v) => v.dias === dias);
   return match ? match.label : `${dias} días`;
 }
 
+function labelCategoria(categoria: string | null) {
+  const match = CATEGORIAS.find((c) => c.value === (categoria ?? ""));
+  return match ? match.label : categoria;
+}
+
 export default function PaquetesPage() {
   const [items, setItems] = useState<Paquete[]>([]);
-  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
   const [nombre, setNombre] = useState("");
   const [vigenciaDias, setVigenciaDias] = useState("7");
-  const [disciplinaId, setDisciplinaId] = useState("");
+  const [categoria, setCategoria] = useState("");
   const [numClases, setNumClases] = useState("");
   const [precio, setPrecio] = useState("");
+  const [compartido, setCompartido] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const fetchAll = async () => {
     setLoading(true);
-    const [{ data: paquetesData }, { data: disciplinasData }] = await Promise.all([
-      supabase
-        .from("paquetes")
-        .select("*, disciplinas ( nombre )")
-        .order("created_at", { ascending: false }),
-      supabase.from("disciplinas").select("id, nombre").order("nombre"),
-    ]);
-    setItems((paquetesData as any) ?? []);
-    setDisciplinas(disciplinasData ?? []);
+    const { data } = await supabase
+      .from("paquetes")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setItems(data ?? []);
     setLoading(false);
   };
 
@@ -63,9 +69,10 @@ export default function PaquetesPage() {
   const resetForm = () => {
     setNombre("");
     setVigenciaDias("7");
-    setDisciplinaId("");
+    setCategoria("");
     setNumClases("");
     setPrecio("");
+    setCompartido(false);
     setError("");
   };
 
@@ -83,9 +90,10 @@ export default function PaquetesPage() {
     const { error } = await supabase.from("paquetes").insert({
       nombre: nombre.trim(),
       vigencia_dias: parseInt(vigenciaDias, 10),
-      disciplina_id: disciplinaId || null,
+      categoria: categoria || null,
       num_clases: parseInt(numClases, 10),
       precio: parseFloat(precio),
+      compartido,
       activo: true,
     });
 
@@ -178,24 +186,27 @@ export default function PaquetesPage() {
 
             <div>
               <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
-                Tipo de clase <span className="text-red-400">*</span>
+                Disciplina <span className="text-red-400">*</span>
               </label>
               <select
-                value={disciplinaId}
-                onChange={(e) => setDisciplinaId(e.target.value)}
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
               >
-                <option value="">Todas las disciplinas</option>
-                {disciplinas.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.nombre}
+                {CATEGORIAS.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
                   </option>
                 ))}
               </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Solo se podrá usar en clases de esta disciplina, a menos que elijas
+                "Todas las disciplinas"
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="block text-xs font-semibold tracking-wide text-gray-500 uppercase mb-1.5">
                 Número de clases <span className="text-red-400">*</span>
@@ -230,6 +241,18 @@ export default function PaquetesPage() {
               </div>
             </div>
           </div>
+
+          <label className="flex items-center gap-2 mb-6 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={compartido}
+              onChange={(e) => setCompartido(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-[#2C2421] focus:ring-[#2C2421]/30"
+            />
+            <span className="text-sm text-gray-700">
+              Paquete compartido (permite reservar varios espacios, ej. "Elite Mix")
+            </span>
+          </label>
 
           {error && (
             <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2 mb-4">
@@ -270,7 +293,7 @@ export default function PaquetesPage() {
                 Vigencia
               </th>
               <th className="text-left px-6 py-4 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                Tipo de clase
+                Disciplina
               </th>
               <th className="text-left px-6 py-4 text-xs font-semibold tracking-wide text-gray-400 uppercase">
                 Clases
@@ -302,12 +325,17 @@ export default function PaquetesPage() {
                 <tr key={item.id} className="border-b border-gray-50 last:border-0">
                   <td className="px-6 py-4 font-medium text-[#2C2421]">
                     {item.nombre}
+                    {item.compartido && (
+                      <span className="ml-2 inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-600 border border-purple-100">
+                        Compartido
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     {labelVigencia(item.vigencia_dias)}
                   </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {item.disciplinas?.nombre || "Todas las disciplinas"}
+                  <td className="px-6 py-4 text-gray-600 capitalize">
+                    {labelCategoria(item.categoria)}
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     {item.num_clases} {item.num_clases === 1 ? "clase" : "clases"}

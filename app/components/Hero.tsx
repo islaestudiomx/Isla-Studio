@@ -48,7 +48,7 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 w-full">
             {/* Botón 1: Fondo Claro */}
             <a
-              href="/horario"
+              href="/horarios"
               className="inline-block bg-[#E8E2DD] text-[#332F2C] px-10 py-4 rounded-full font-semibold text-base hover:bg-white transition-colors shadow-lg text-center"
             >
               Ver horarios

@@ -11,14 +11,14 @@ import { supabase } from '@/utils/supabase'
 
 const NAV_LINKS = [
   { label: "Inicio", href: "/" },
-  { label: "Horario", href: "/horario" },
+  { label: "Horarios", href: "/horarios" },
   { label: "Eventos", href: "/eventos" },
   { label: "Paquetes", href: "/paquetes" },
 ];
 
 const BOTTOM_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Horario", href: "/horario", icon: Calendar },
+  { label: "Horarios", href: "/horarios", icon: Calendar },
   { label: "Eventos", href: "/Eventos", icon: Zap },
   { label: "Paquetes", href: "/paquetes", icon: Package },
 ];
@@ -26,7 +26,7 @@ const BOTTOM_NAV = [
 const MENU_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Inicio", href: "/" },
-  { label: "Horario", href: "/horario" },
+  { label: "Horarios", href: "/horarios" },
   { label: "Disciplinas", href: "/disciplinas" },
   { label: "Paquetes", href: "/paquetes" },
 ];
@@ -220,6 +220,9 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
 
+  // Verificamos si estamos en la página de inicio
+  const isHome = pathname === "/"
+
   // Detectar el scroll de la página
   useEffect(() => {
     const handleScroll = () => {
@@ -279,12 +282,15 @@ export default function Navbar() {
     }
   }, [])
 
+  // El navbar tendrá fondo sólido y texto oscuro si NO estamos en Home, o si ya se hizo scroll en Home.
+  const useSolidNav = !isHome || isScrolled
+
   return (
     <>
       {/* ── Top bar con transición de scroll ── */}
       <header 
         className={`fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 flex items-center ${
-          isScrolled 
+          useSolidNav 
             ? "bg-[#F5F2EF]/90 backdrop-blur-md border-b border-[#2C2421]/10 shadow-xs" 
             : "bg-transparent border-b border-transparent"
         }`}
@@ -295,7 +301,7 @@ export default function Navbar() {
           <a 
             href="/" 
             className={`font-serif tracking-wider text-base md:text-lg transition-colors ${
-              isScrolled ? "text-[#2C2421]" : "text-white"
+              useSolidNav ? "text-[#2C2421]" : "text-white"
             }`}
           >
             ISLA
@@ -310,7 +316,7 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                    isScrolled 
+                    useSolidNav 
                       ? (isActive ? 'text-[#2C2421] font-semibold' : 'text-gray-600 hover:text-[#2C2421]')
                       : (isActive ? 'text-white font-semibold' : 'text-white/80 hover:text-white')
                   }`}
@@ -318,7 +324,7 @@ export default function Navbar() {
                   {link.label}
                   {isActive && (
                     <span className={`absolute bottom-0 left-4 right-4 h-0.5 rounded-full ${
-                      isScrolled ? "bg-[#2C2421]" : "bg-white"
+                      useSolidNav ? "bg-[#2C2421]" : "bg-white"
                     }`} />
                   )}
                 </Link>
@@ -331,7 +337,7 @@ export default function Navbar() {
             <Link
               href="/dashboard"
               className={`hidden md:block text-sm font-medium transition-colors ${
-                isScrolled ? "text-gray-700 hover:text-[#2C2421]" : "text-white/90 hover:text-white"
+                useSolidNav ? "text-gray-700 hover:text-[#2C2421]" : "text-white/90 hover:text-white"
               }`}
             >
               Dashboard
@@ -348,7 +354,7 @@ export default function Navbar() {
                 <Link
                   href="/login"
                   className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-                    isScrolled 
+                    useSolidNav 
                       ? "bg-[#2C2421] text-white hover:bg-black" 
                       : "bg-white text-[#2C2421] hover:bg-stone-100 shadow-md"
                   }`}

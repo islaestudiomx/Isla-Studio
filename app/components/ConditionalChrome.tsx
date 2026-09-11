@@ -10,9 +10,10 @@ export default function ConditionalChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
+  const esPanelInterno =
+    pathname.startsWith("/admin") || pathname.startsWith("/instructores");
 
-  if (isAdmin) {
+  if (esPanelInterno) {
     return <>{children}</>;
   }
 

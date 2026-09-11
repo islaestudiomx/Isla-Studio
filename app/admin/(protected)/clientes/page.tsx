@@ -37,7 +37,6 @@ export default function ClientesPage() {
         supabase
           .from("profiles")
           .select("id, full_name")
-          .eq("role", "client")
           .order("full_name"),
         supabase.from("reservas").select("cliente_id, estado, created_at"),
         supabase
