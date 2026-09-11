@@ -25,7 +25,6 @@ export default function ClientesInfoPage() {
       const { data } = await supabase
         .from("profiles")
         .select("id, full_name, email")
-        .eq("role", "client")
         .order("full_name");
       setClientes(data ?? []);
       setLoading(false);

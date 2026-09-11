@@ -27,15 +27,12 @@ const MENU_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Inicio", href: "/" },
   { label: "Horarios", href: "/horarios" },
-  { label: "Disciplinas", href: "/disciplinas" },
+  { label: "Eventos", href: "/eventos" },
   { label: "Paquetes", href: "/paquetes" },
 ];
 
 const ACCOUNT_LINKS = [
   { label: "Mi perfil", href: "/perfil" },
-  { label: "Mis reservas", href: "/reservas" },
-  { label: "Mis membresías", href: "/membresias" },
-  { label: "Mis facturas", href: "/facturas" },
 ];
 
 // ── Mobile Menu (fullscreen) ───────────────────────────────────

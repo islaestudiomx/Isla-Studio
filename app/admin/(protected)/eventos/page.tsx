@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/utils/supabase";
-import { Plus, Users, Trash2 } from "lucide-react";
+import { Plus, Users, Trash2, X, Search } from "lucide-react";
 import ImageUpload from "@/app/components/admin/ImageUpload";
-import EventRegistrationsModal from "@/app/components/admin/EventRegistrationsModal";
 
 type Evento = {
   id: string;
@@ -13,9 +12,22 @@ type Evento = {
   fecha_fin: string | null;
   ubicacion: string | null;
   precio_regular: number;
-  creditos_otorgados: number;
   imagen_url: string | null;
   estado: string;
+};
+
+type Registro = {
+  id: string;
+  cliente_id: string | null;
+  nombre: string | null;
+  email: string | null;
+  created_at: string;
+};
+
+type Profile = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
 };
 
 function formatRango(inicio: string, fin: string | null) {
@@ -40,10 +52,6 @@ export default function EventosPage() {
   const [ubicacion, setUbicacion] = useState("Isla Studio");
   const [capacidad, setCapacidad] = useState("");
   const [precioRegular, setPrecioRegular] = useState("");
-  const [precioMiembros, setPrecioMiembros] = useState("");
-  const [limiteMiembros, setLimiteMiembros] = useState("");
-  const [creditos, setCreditos] = useState("");
-  const [diasValidez, setDiasValidez] = useState("");
   const [imagenUrl, setImagenUrl] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [saving, setSaving] = useState(false);
@@ -84,10 +92,6 @@ export default function EventosPage() {
     setUbicacion("Isla Studio");
     setCapacidad("");
     setPrecioRegular("");
-    setPrecioMiembros("");
-    setLimiteMiembros("");
-    setCreditos("");
-    setDiasValidez("");
     setImagenUrl("");
     setDescripcion("");
     setError("");
@@ -111,10 +115,6 @@ export default function EventosPage() {
       ubicacion: ubicacion.trim() || null,
       capacidad: capacidad ? parseInt(capacidad, 10) : null,
       precio_regular: precioRegular ? parseFloat(precioRegular) : 0,
-      precio_miembros_k: precioMiembros ? parseFloat(precioMiembros) : null,
-      limite_miembros_k: limiteMiembros ? new Date(limiteMiembros).toISOString() : null,
-      creditos_otorgados: creditos ? parseInt(creditos, 10) : 0,
-      dias_validez: diasValidez ? parseInt(diasValidez, 10) : null,
       imagen_url: imagenUrl || null,
       descripcion: descripcion.trim() || null,
       estado: "activo",
@@ -230,7 +230,7 @@ export default function EventosPage() {
           </div>
 
           <h3 className="text-sm font-semibold text-[#2C2421] mb-4 pt-2 border-t border-gray-100">
-            Precios y créditos
+            Precio
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -248,60 +248,6 @@ export default function EventosPage() {
                   className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
                 />
               </div>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold tracking-wide text-green-600 uppercase mb-1.5">
-                Miembros K (opcional)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                <input
-                  type="number"
-                  value={precioMiembros}
-                  onChange={(e) => setPrecioMiembros(e.target.value)}
-                  placeholder="Ej: 1099"
-                  className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-green-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-5">
-            <label className="block text-xs font-semibold tracking-wide text-green-600 uppercase mb-1.5">
-              Límite precio miembros K
-            </label>
-            <input
-              type="datetime-local"
-              value={limiteMiembros}
-              onChange={(e) => setLimiteMiembros(e.target.value)}
-              className="w-full md:w-1/2 px-4 py-2.5 rounded-xl border border-green-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-400"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-            <div>
-              <label className="block text-xs font-semibold tracking-wide text-blue-600 uppercase mb-1.5">
-                Créditos a otorgar
-              </label>
-              <input
-                type="number"
-                value={creditos}
-                onChange={(e) => setCreditos(e.target.value)}
-                placeholder="Ej: 12"
-                className="w-full px-4 py-2.5 rounded-xl border border-blue-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold tracking-wide text-blue-600 uppercase mb-1.5">
-                Días de validez
-              </label>
-              <input
-                type="number"
-                value={diasValidez}
-                onChange={(e) => setDiasValidez(e.target.value)}
-                placeholder="Ej: 21"
-                className="w-full px-4 py-2.5 rounded-xl border border-blue-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
-              />
             </div>
           </div>
 
@@ -389,13 +335,8 @@ export default function EventosPage() {
                         Reg: ${evento.precio_regular.toLocaleString("es-MX")}
                       </span>
                       <span className="text-xs text-gray-400">
-                        {conteos[evento.id] || 0}
+                        {conteos[evento.id] || 0} registrados
                       </span>
-                      {evento.creditos_otorgados > 0 && (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-50 border border-blue-100 text-blue-600">
-                          +{evento.creditos_otorgados} Créditos
-                        </span>
-                      )}
                     </div>
                   )}
                 </div>
@@ -428,12 +369,207 @@ export default function EventosPage() {
       </div>
 
       {modalEvento && (
-        <EventRegistrationsModal
+        <EventRegistrationsModalWithSearch
           eventoId={modalEvento.id}
           eventoTitulo={modalEvento.titulo}
-          onClose={() => setModalEvento(null)}
+          onClose={() => {
+            setModalEvento(null);
+            fetchAll();
+          }}
         />
       )}
+    </div>
+  );
+}
+
+// Subcomponente interno del modal de registrados con buscador integrado
+function EventRegistrationsModalWithSearch({
+  eventoId,
+  eventoTitulo,
+  onClose,
+}: {
+  eventoId: string;
+  eventoTitulo: string;
+  onClose: () => void;
+}) {
+  const [registros, setRegistros] = useState<Registro[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [buscando, setBuscando] = useState(false);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const fetchRegistros = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("eventos_registros")
+      .select("*")
+      .eq("evento_id", eventoId)
+      .order("created_at", { ascending: false });
+
+    setRegistros(data ?? []);
+    setLoading(false);
+  }, [eventoId]);
+
+  useEffect(() => {
+    fetchRegistros();
+  }, [fetchRegistros]);
+
+  useEffect(() => {
+    if (buscando) {
+      const fetchProfiles = async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .order("full_name");
+        setProfiles(data ?? []);
+      };
+      fetchProfiles();
+    }
+  }, [buscando]);
+
+  const perfilesFiltrados = profiles.filter((p) =>
+    (p.full_name || "").toLowerCase().includes(busqueda.toLowerCase()) ||
+    (p.email || "").toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  const handleAgregarUsuario = async (profile: Profile) => {
+    setSaving(true);
+    const { error } = await supabase.from("eventos_registros").insert({
+      evento_id: eventoId,
+      cliente_id: profile.id,
+      nombre: profile.full_name || "Sin nombre",
+      email: profile.email || "",
+    });
+
+    setSaving(false);
+
+    if (error) {
+      alert("Error al registrar: " + error.message);
+      return;
+    }
+
+    setBuscando(false);
+    setBusqueda("");
+    fetchRegistros();
+  };
+
+  const handleEliminar = async (registroId: string) => {
+    if (!confirm("¿Eliminar este registro del evento?")) return;
+    await supabase.from("eventos_registros").delete().eq("id", registroId);
+    fetchRegistros();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
+        
+        <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100 shrink-0">
+          <div>
+            <h2 className="font-serif text-xl text-[#2C2421] font-medium">Registrados</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{eventoTitulo}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-[#2C2421]"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="px-6 py-4 overflow-y-auto flex-1 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+              Asistentes ({registros.length})
+            </span>
+            <button
+              onClick={() => setBuscando(!buscando)}
+              className="text-xs font-semibold text-[#2C2421] border border-gray-200 rounded-full px-3 py-1.5 hover:bg-gray-50 transition-colors"
+            >
+              {buscando ? "Cerrar buscador" : "+ Agregar asistente"}
+            </button>
+          </div>
+
+          {buscando && (
+            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 space-y-2">
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  placeholder="Buscar usuario o correo..."
+                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-[#2C2421]"
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {perfilesFiltrados.length === 0 ? (
+                  <p className="text-xs text-gray-400 text-center py-3">No se encontraron cuentas.</p>
+                ) : (
+                  perfilesFiltrados.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => handleAgregarUsuario(p)}
+                      disabled={saving}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white transition-colors flex items-center justify-between border border-transparent hover:border-gray-200"
+                    >
+                      <div>
+                        <p className="text-xs font-semibold text-[#2C2421]">
+                          {p.full_name || "Sin nombre"}
+                        </p>
+                        <p className="text-[10px] text-gray-400">{p.email}</p>
+                      </div>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
+                        + Añadir
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {loading ? (
+            <p className="text-xs text-gray-400 text-center py-8">Cargando...</p>
+          ) : registros.length === 0 ? (
+            <p className="text-xs text-gray-400 text-center py-8">Nadie se ha registrado todavía.</p>
+          ) : (
+            <div className="space-y-2">
+              {registros.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between bg-gray-50/50 border border-gray-100 px-4 py-2.5 rounded-xl text-sm"
+                >
+                  <div>
+                    <p className="font-medium text-[#2C2421] text-xs">
+                      {r.nombre || "Usuario"}
+                    </p>
+                    <p className="text-[11px] text-gray-400">{r.email}</p>
+                  </div>
+                  <button
+                    onClick={() => handleEliminar(r.id)}
+                    className="text-gray-300 hover:text-red-500 p-1 transition-colors"
+                    title="Eliminar registro"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 shrink-0 flex justify-end">
+          <button
+            onClick={onClose}
+            className="bg-[#2C2421] hover:bg-black text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-colors"
+          >
+            Cerrar
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }

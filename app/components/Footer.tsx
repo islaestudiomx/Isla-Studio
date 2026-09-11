@@ -5,7 +5,7 @@ import { MapPin } from "lucide-react";
 const FOOTER_NAV = [
   { label: "Inicio", href: "/" },
   { label: "Horarios", href: "/horarios" },
-  { label: "Disciplinas", href: "/disciplinas" },
+  { label: "Eventos", href: "/eventos" },
   { label: "Paquetes", href: "/paquetes" },
 ];
 
@@ -51,7 +51,7 @@ export default function Footer() {
             </h2>
             <p className="text-sm text-[#2C2421]/70 leading-relaxed max-w-xs">
               Tu espacio para moverte, crecer y sentirte bien. Clases de
-              Indoor Cycling, Pilates Flow y Pilates Mat.
+              Barre, Yoga y Pilates.
             </p>
             <div className="flex items-center gap-3 mt-5">
               <Link
