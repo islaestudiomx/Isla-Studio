@@ -19,7 +19,7 @@ const NAV_LINKS = [
 const BOTTOM_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Horarios", href: "/horarios", icon: Calendar },
-  { label: "Eventos", href: "/Eventos", icon: Zap },
+  { label: "Eventos", href: "/eventos", icon: Zap },
   { label: "Paquetes", href: "/paquetes", icon: Package },
 ];
 

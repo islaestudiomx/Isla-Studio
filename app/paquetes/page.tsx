@@ -47,7 +47,7 @@ export default function ClientPaquetesPage() {
     const mensaje = encodeURIComponent(
       `Hola! Me interesa comprar el paquete *${paquete.nombre}* (${paquete.num_clases} clases) por $${paquete.precio ?? 0} MXN. Adjunto mi comprobante.`
     );
-    window.open(`https://wa.me/529990000000?text=${mensaje}`, "_blank");
+    window.open(`https://wa.me/529671331701?text=${mensaje}`, "_blank");
   };
 
   return (
@@ -161,19 +161,19 @@ export default function ClientPaquetesPage() {
             <div className="bg-[#F5F2EF] rounded-2xl p-5 border border-[#2C2421]/10 space-y-3 mb-6 text-sm">
               <div className="flex justify-between items-center border-b border-[#2C2421]/5 pb-2">
                 <span className="text-xs font-semibold text-[#2C2421]/50 uppercase">Banco:</span>
-                <span className="font-bold text-[#2C2421]">SANTANDER</span>
+                <span className="font-bold text-[#2C2421]">BBVA</span>
               </div>
               <div className="flex justify-between items-center border-b border-[#2C2421]/5 pb-2">
                 <span className="text-xs font-semibold text-[#2C2421]/50 uppercase">Titular:</span>
-                <span className="font-semibold text-[#2C2421]">Consuelo Aguilar</span>
+                <span className="font-semibold text-[#2C2421]">Martha Paola Vargas Paniagua</span>
               </div>
               <div className="flex justify-between items-center border-b border-[#2C2421]/5 pb-2">
                 <span className="text-xs font-semibold text-[#2C2421]/50 uppercase">No. De Tarjeta:</span>
-                <span className="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-medium">5579 0990 1864 0724</span>
+                <span className="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-medium">4152 3144 5881 1406</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs font-semibold text-[#2C2421]/50 uppercase">Cuenta Clabe:</span>
-                <span className="font-mono text-green-700 bg-green-50 px-2 py-0.5 rounded font-medium">014130200125155444</span>
+                <span className="font-mono text-green-700 bg-green-50 px-2 py-0.5 rounded font-medium">012 180 01543356522 2</span>
               </div>
             </div>
 

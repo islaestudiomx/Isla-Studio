@@ -26,7 +26,7 @@ export default function Hero() {
           
           {/* Breadcrumb o Título Pequeño Superior */}
           <p className="text-sm font-medium tracking-wider uppercase text-stone-200 mb-8">
-            ISLA &nbsp;·&nbsp; STUDIO &nbsp;·&nbsp; PILATES
+            ISLA &nbsp;·&nbsp; STUDIO
           </p>
 
           {/* Título Principal Combinado (Normal + Itálica) */}

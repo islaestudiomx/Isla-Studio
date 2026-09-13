@@ -136,7 +136,7 @@ export default function TiposClasePage() {
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Indoor ..."
+                placeholder="Ej: Yoga ..."
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C2421]/20 focus:border-[#2C2421]"
               />
             </div>
