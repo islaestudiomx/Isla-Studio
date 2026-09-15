@@ -37,11 +37,6 @@ const LINKS = [
     href: "https://instagram.com",
     icon: InstagramIcon,
   },
-  {
-    name: "TikTok",
-    href: "https://tiktok.com",
-    icon: TikTokIcon,
-  },
 ];
 
 export default function LinksSection() {

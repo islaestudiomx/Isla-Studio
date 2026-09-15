@@ -63,14 +63,6 @@ export default function Footer() {
                 <InstagramIcon className="w-4 h-4" />
               </Link>
               
-              <Link
-                href="https://tiktok.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full border border-[#2C2421]/20 flex items-center justify-center text-[#2C2421] hover:bg-[#2C2421] hover:text-white transition-colors"
-              >
-                <TikTokIcon className="w-4 h-4" />
-              </Link>
             </div>
           </div>
 
