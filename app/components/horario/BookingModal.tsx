@@ -30,6 +30,12 @@ function categoriaDeClase(nombre: string) {
 function esCompatible(compra: CompraPaquete, categoriaSesion: string) {
   const categoriaPaquete = compra.paquetes?.categoria ?? null;
   if (categoriaPaquete === null) return true; // "Todas las disciplinas"
+
+  // Excepción: Fusion acepta paquetes de Pilates o Barre, pero nunca de Yoga
+  if (categoriaSesion === "fusion") {
+    return categoriaPaquete === "pilates" || categoriaPaquete === "barre";
+  }
+
   return categoriaPaquete === categoriaSesion;
 }
 
