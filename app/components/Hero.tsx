@@ -56,7 +56,7 @@ export default function Hero() {
             
             {/* Botón 2: Borde Transparente */}
             <a
-              href="/nuestras-clases"
+              href="/paquetes"
               className="inline-block bg-transparent border border-[#715E4B] text-white px-10 py-4 rounded-full font-semibold text-base transition-colors text-center"
             >
               Nuestros Paquetes
